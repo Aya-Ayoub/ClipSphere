@@ -1,27 +1,41 @@
 const User = require("../models/User");
 
-exports.getMe = async(req,res)=>{
+exports.getMe = async (req, res) => {
 
-res.json(req.user);
+  const user = await User.findById(req.user.id);
 
-};
-
-exports.updateMe = async(req,res)=>{
-
-const user = await User.findByIdAndUpdate(
-req.user.id,
-req.body,
-{ new:true }
-);
-
-res.json(user);
+  res.json(user);
 
 };
 
-exports.getUser = async(req,res)=>{
+exports.updateMe = async (req, res) => {
 
-const user = await User.findById(req.params.id);
+  const user = await User.findByIdAndUpdate(
+    req.user.id,
+    req.body,
+    { new: true }
+  );
 
-res.json(user);
+  res.json(user);
+
+};
+
+exports.getUser = async (req, res) => {
+
+  const user = await User.findById(req.params.id);
+
+  res.json(user);
+
+};
+
+exports.updatePreferences = async (req, res) => {
+
+  const user = await User.findByIdAndUpdate(
+    req.user.id,
+    { preferences: req.body.preferences },
+    { new: true }
+  );
+
+  res.json(user);
 
 };

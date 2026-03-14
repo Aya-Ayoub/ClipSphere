@@ -34,6 +34,29 @@ const userSchema = new mongoose.Schema(
   active: {
     type: Boolean,
     default: true
+  },
+
+  preferences:{
+
+    inApp:{
+      followers:{type:Boolean,default:true},
+      comments:{type:Boolean,default:true},
+      likes:{type:Boolean,default:true},
+      tips:{type:Boolean,default:true}
+    },
+
+    email:{
+      followers:{type:Boolean,default:true},
+      comments:{type:Boolean,default:true},
+      likes:{type:Boolean,default:true},
+      tips:{type:Boolean,default:true}
+    }
+
+  },
+
+  accountStatus:{
+    type:String,
+    default:"active"
   }
 
 },

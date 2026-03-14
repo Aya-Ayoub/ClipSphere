@@ -1,19 +1,17 @@
-module.exports = (schema)=>{
+module.exports = (schema)=>(req,res,next)=>{
 
-return (req,res,next)=>{
+  try{
 
-try{
+    schema.parse(req.body);
 
-schema.parse(req.body);
+    next();
 
-next();
+  }catch(err){
 
-}catch(err){
+    res.status(400).json({
+      error:err.errors
+    });
 
-res.status(400).json({error:err.errors});
-
-}
-
-};
+  }
 
 };

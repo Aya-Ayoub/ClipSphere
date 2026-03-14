@@ -1,47 +1,69 @@
-const Follower = require("../models/Follower");
+const Follow = require("../models/Follow");
 
-exports.followUser = async(req,res)=>{
+exports.followUser = async (req, res) => {
+  try {
 
-if(req.user.id === req.params.id){
-return res.status(400).json({message:"Cannot follow yourself"});
-}
+    const follow = await Follow.create({
+      followerId: req.user.id,
+      followingId: req.params.id
+    });
 
-const follow = await Follower.create({
-followerId:req.user.id,
-followingId:req.params.id
-});
+    res.status(201).json(follow);
 
-res.json(follow);
+  } catch (err) {
 
+    res.status(400).json({
+      message: err.message
+    });
+
+  }
 };
 
-exports.unfollowUser = async(req,res)=>{
+exports.unfollowUser = async (req, res) => {
+  try {
 
-await Follower.deleteOne({
-followerId:req.user.id,
-followingId:req.params.id
-});
+    await Follow.findOneAndDelete({
+      followerId: req.user.id,
+      followingId: req.params.id
+    });
 
-res.json({message:"Unfollowed"});
+    res.json({ message: "Unfollowed" });
 
+  } catch (err) {
+
+    res.status(400).json({ message: err.message });
+
+  }
 };
 
-exports.getFollowers = async(req,res)=>{
+exports.getFollowers = async (req, res) => {
+  try {
 
-const followers = await Follower.find({
-followingId:req.params.id
-});
+    const followers = await Follow.find({
+      followingId: req.params.id
+    });
 
-res.json(followers);
+    res.json(followers);
 
+  } catch (err) {
+
+    res.status(400).json({ message: err.message });
+
+  }
 };
 
-exports.getFollowing = async(req,res)=>{
+exports.getFollowing = async (req, res) => {
+  try {
 
-const following = await Follower.find({
-followerId:req.params.id
-});
+    const following = await Follow.find({
+      followerId: req.params.id
+    });
 
-res.json(following);
+    res.json(following);
 
+  } catch (err) {
+
+    res.status(400).json({ message: err.message });
+
+  }
 };
