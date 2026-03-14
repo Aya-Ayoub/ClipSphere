@@ -1,35 +1,32 @@
 const mongoose = require("mongoose");
 
-const followSchema = new mongoose.Schema({
-
-  followerId:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref:"User",
-    required:true
+const followSchema = new mongoose.Schema(
+  {
+    followerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
+    followingId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    }
   },
-
-  followingId:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref:"User",
-    required:true
-  }
-
-});
-
-/* Prevent duplicate follows */
-followSchema.index(
-  { followerId:1, followingId:1 },
-  { unique:true }
+  { timestamps: true }
 );
 
-/* Prevent self-follow */
+//prevent duplicate follows
+followSchema.index({ followerId: 1, followingId: 1 }, { unique: true });
 
-followSchema.pre("save", function(){
-
-  if(this.followerId.toString() === this.followingId.toString()){
-    throw new Error("Cannot follow yourself");
+//prevent self-follow
+followSchema.pre("save", function (next) {
+  if (this.followerId.toString() === this.followingId.toString()) {
+    const err = new Error("You cannot follow yourself");
+    err.statusCode = 400;
+    return next(err);
   }
-
+  next();
 });
 
-module.exports = mongoose.model("Follow",followSchema);
+module.exports = mongoose.model("Follow", followSchema);

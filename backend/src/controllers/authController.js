@@ -5,7 +5,7 @@ exports.register = async (req, res) => {
 
     const user = await authService.register(req.body);
 
-    // hide password from response
+    //hide password from response
     user.password = undefined;
 
     res.status(201).json({
@@ -29,7 +29,7 @@ exports.login = async (req, res) => {
 
     const result = await authService.login(email, password);
 
-    // hide password if it exists
+    //hide password ifexists
     if (result.user) result.user.password = undefined;
 
     res.status(200).json({
