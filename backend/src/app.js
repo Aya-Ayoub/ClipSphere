@@ -9,6 +9,7 @@ require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const followRoutes = require("./routes/followRoutes");
 const videoRoutes = require("./routes/videoRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const adminRoutes = require("./routes/adminRoutes");
@@ -17,7 +18,7 @@ const globalErrorHandler = require("./middleware/globalErrorHandler");
 
 const app = express();
 
-//middlewar
+// Middleware
 app.use(express.json());
 app.use(cors());
 app.use(morgan("dev"));
@@ -27,7 +28,8 @@ app.use((req, res, next) => {
   mongoSanitize.sanitize(req.params);
   next();
 });
-//swagger
+
+// Swagger
 const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
@@ -133,27 +135,28 @@ const swaggerOptions = {
       }
     }
   },
-  //scan routes for @swagger comments
+  // Scan all route files for @swagger comments
   apis: ["./src/routes/*.js"]
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-//db
+// Database
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-//routes
+// Routes
 app.use("/api/v1/auth",   authRoutes);
 app.use("/api/v1/users",  userRoutes);
+app.use("/api/v1/users",  followRoutes);   // follow/unfollow/followers/following
 app.use("/api/v1/videos", videoRoutes);
-app.use("/api/v1/videos", reviewRoutes);  // POST /api/v1/videos/:id/reviews
+app.use("/api/v1/videos", reviewRoutes);   // POST /api/v1/videos/:id/reviews
 app.use("/api/v1/admin",  adminRoutes);
 
-//health check
+// Health check
 /**
  * @swagger
  * /health:
@@ -177,12 +180,12 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "API running" });
 });
 
-//404 for unknown routes
+// 404 for unknown routes
 app.use((req, res) => {
   res.status(404).json({ status: "fail", message: `Route ${req.originalUrl} not found` });
 });
 
-//Global Error Handler
+// Global Error Handler (must be last)
 app.use(globalErrorHandler);
 
 module.exports = app;

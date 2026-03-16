@@ -1,4 +1,5 @@
 const Follower = require("../models/Follower");
+const notificationService = require("./notificationService");
 
 exports.followUser = async (followerId, followingId) => {
   if (followerId === followingId) {
@@ -8,6 +9,9 @@ exports.followUser = async (followerId, followingId) => {
   }
 
   const follow = await Follower.create({ followerId, followingId });
+
+  await notificationService.createIfAllowed(followingId, followerId, "follow");
+
   return follow;
 };
 
