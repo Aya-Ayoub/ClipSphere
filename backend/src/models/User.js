@@ -2,74 +2,83 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
-{
-  username: {
-    type: String,
-    required: true,
-    unique: true
-  },
-
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
-
-  password: {
-    type: String,
-    required: true,
-    select: false
-  },
-
-  role: {
-    type: String,
-    enum: ["user","admin"],
-    default: "user"
-  },
-
-  bio: String,
-
-  avatarKey: String,
-
-  active: {
-    type: Boolean,
-    default: true
-  },
-
-  preferences:{
-
-    inApp:{
-      followers:{type:Boolean,default:true},
-      comments:{type:Boolean,default:true},
-      likes:{type:Boolean,default:true},
-      tips:{type:Boolean,default:true}
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
     },
 
-    email:{
-      followers:{type:Boolean,default:true},
-      comments:{type:Boolean,default:true},
-      likes:{type:Boolean,default:true},
-      tips:{type:Boolean,default:true}
-    }
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, "Please provide a valid email address"],
+    },
 
+    password: {
+      type: String,
+      required: true,
+      select: false,
+      minlength: [6, "Password must be at least 6 characters"],
+    },
+
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+
+    bio: {
+      type: String,
+      maxlength: 200,
+    },
+
+    // Placeholder for MinIO object key (used in Phase 2)
+    avatarKey: {
+      type: String,
+    },
+
+    // Soft delete — admin can deactivate accounts
+    active: {
+      type: Boolean,
+      default: true,
+    },
+
+    // Moderation status — used by admin ban hammer
+    accountStatus: {
+      type: String,
+      enum: ["active", "banned", "suspended"],
+      default: "active",
+    },
+
+    // Notification preferences
+    preferences: {
+      inApp: {
+        followers: { type: Boolean, default: true },
+        comments: { type: Boolean, default: true },
+        likes: { type: Boolean, default: true },
+        tips: { type: Boolean, default: true },
+      },
+      email: {
+        followers: { type: Boolean, default: true },
+        comments: { type: Boolean, default: true },
+        likes: { type: Boolean, default: true },
+        tips: { type: Boolean, default: true },
+      },
+    },
   },
-
-  accountStatus:{
-    type:String,
-    default:"active"
-  }
-
-},
-{ timestamps:true }
+  { timestamps: true }
 );
 
-userSchema.pre("save", async function(next){
-
-  if(!this.isModified("password")) return next();
-
-  this.password = await bcrypt.hash(this.password,10);
-
-
+// Hash password before saving if it was modified
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
 });
 
-module.exports = mongoose.model("User",userSchema);
+module.exports = mongoose.model("User", userSchema);

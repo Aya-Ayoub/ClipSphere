@@ -1,39 +1,36 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-module.exports = async (req,res,next)=>{
+module.exports = async (req, res, next) => {
+  try {
+    let token;
 
-try{
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    }
 
-let token;
+    if (!token) {
+      return res.status(401).json({ message: "Not authenticated — no token provided" });
+    }
 
-if(
-req.headers.authorization &&
-req.headers.authorization.startsWith("Bearer")
-){
-token = req.headers.authorization.split(" ")[1];
-}
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-if(!token){
-return res.status(401).json({message:"Not authenticated"});
-}
+    const user = await User.findById(decoded.id);
 
-const decoded = jwt.verify(token,process.env.JWT_SECRET);
+    if (!user) {
+      return res.status(401).json({ message: "User no longer exists" });
+    }
 
-const user = await User.findById(decoded.id);
+    if (!user.active) {
+      return res.status(401).json({ message: "This account has been deactivated" });
+    }
 
-if(!user){
-return res.status(401).json({message:"User not found"});
-}
-
-req.user = user;
-
-next();
-
-}catch(err){
-
-res.status(401).json({message:"Invalid token"});
-
-}
-
+    req.user = user;
+    next();
+  } catch (err) {
+    res.status(401).json({ message: "Invalid or expired token" });
+  }
 };
