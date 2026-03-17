@@ -1,5 +1,5 @@
 const Follower = require("../models/Follower");
-const notificationService = require("./notificationService");
+const notificationService = require("./notificationServices");
 
 exports.followUser = async (followerId, followingId) => {
   if (followerId === followingId) {

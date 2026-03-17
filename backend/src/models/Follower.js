@@ -7,7 +7,6 @@ const followerSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-
     followingId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -21,9 +20,9 @@ const followerSchema = new mongoose.Schema(
 followerSchema.index({ followerId: 1, followingId: 1 }, { unique: true });
 
 // Pre-save hook — prevents a user from following themselves
-followerSchema.pre("save", function (next) {
+followerSchema.pre("save", function () {
   if (this.followerId.toString() === this.followingId.toString()) {
-    return next(new Error("You cannot follow yourself"));
+    throw new Error("You cannot follow yourself");
   }
 });
 

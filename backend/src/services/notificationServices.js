@@ -44,12 +44,11 @@ exports.createIfAllowed = async (recipientId, senderId, type) => {
     );
   }
 
-  // Email would be queued here in Phase 2 (Nodemailer integration)
   if (emailAllowed) {
     console.log(
       `Email notification queued for user ${recipientId} — type "${type}" (Phase 2)`
     );
-    // TODO Phase 2: emailQueue.add({ recipientId, senderId, type });
+
   }
 
   return notification;
