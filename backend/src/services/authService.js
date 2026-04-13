@@ -1,11 +1,11 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const emailService = require("./emailService");
 
 exports.register = async (data) => {
   const { username, email, password } = data;
 
-  // Check if email already in use
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     const err = new Error("Email already in use");
@@ -13,14 +13,16 @@ exports.register = async (data) => {
     throw err;
   }
 
-  // Password is hashed by the User schema pre-save hook
+  // Password hashed by User schema pre-save hook
   const user = await User.create({ username, email, password });
+
+  // Send welcome email — non-blocking, won't crash if it fails
+  emailService.sendWelcomeEmail(email, username);
 
   return user;
 };
 
 exports.login = async (email, password) => {
-  // Must explicitly select password since it has select: false in schema
   const user = await User.findOne({ email }).select("+password");
 
   if (!user) {

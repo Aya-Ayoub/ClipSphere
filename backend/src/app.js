@@ -13,7 +13,7 @@ const followRoutes = require("./routes/followRoutes");
 const videoRoutes = require("./routes/videoRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-
+const { initBuckets } = require("./config/minio");
 const globalErrorHandler = require("./middleware/globalErrorHandler");
 
 const app = express();
@@ -145,7 +145,10 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Database
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => console.log("MongoDB connected"))
+  .then(async () => {
+    console.log("MongoDB connected");
+    await initBuckets();
+  })
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Routes
