@@ -39,3 +39,19 @@ exports.getFollowing = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getFollowStatus = async (req, res, next) => {
+  try {
+    const follow = await followService.isFollowing(
+      req.user.id,
+      req.params.id
+    );
+
+    res.status(200).json({
+      status: "success",
+      following: follow,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

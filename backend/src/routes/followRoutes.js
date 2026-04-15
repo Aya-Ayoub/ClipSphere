@@ -96,5 +96,5 @@ router.get("/:id/followers", controller.getFollowers);
  *         description: Array of following records
  */
 router.get("/:id/following", controller.getFollowing);
-
+router.get("/:id/follow-status", protect, controller.getFollowStatus);
 module.exports = router;
