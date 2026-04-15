@@ -62,7 +62,7 @@ export default function ReviewForm({ videoId, onSubmitted }: ReviewFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm px-5 py-2 rounded-lg transition-colors"
+        className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors"
       >
         {loading ? "Submitting..." : "Submit Review"}
       </button>

@@ -52,100 +52,114 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-10">
-      <h1 className="text-2xl font-bold text-white mb-6">Upload a Video</h1>
+    <div className="bg-black min-h-screen">
+      <div className="max-w-2xl mx-auto px-4 py-10">
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+        <h1 className="text-2xl font-bold text-white mb-6 tracking-tight">
+          Upload a Video
+        </h1>
 
-        {/* File picker */}
-        <div
-          role="button"
-          tabIndex={0}
-          aria-label="Select a video file to upload"
-          onClick={() => fileRef.current?.click()}
-          onKeyDown={(e) => e.key === "Enter" && fileRef.current?.click()}
-          className="border-2 border-dashed border-zinc-700 hover:border-indigo-500 rounded-xl p-8 text-center cursor-pointer transition-colors"
-        >
-          {preview ? (
-            <video src={preview} className="max-h-48 mx-auto rounded-lg" controls />
-          ) : (
-            <div className="space-y-2">
-              <div className="text-4xl">🎬</div>
-              <p className="text-zinc-400 text-sm">Click to select a video file</p>
-              <p className="text-zinc-600 text-xs">MP4, MOV, WebM — max 5 minutes</p>
-            </div>
-          )}
-          <input
-            ref={fileRef}
-            id="video-file"
-            type="file"
-            accept="video/*"
-            aria-label="Video file input"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
 
-        {/* Title */}
-        <div>
-          <label htmlFor="video-title" className="block text-sm text-zinc-400 mb-1">
-            Title *
-          </label>
-          <input
-            id="video-title"
-            type="text"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            maxLength={100}
-            required
-            className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 transition-colors text-sm"
-            placeholder="Give your video a title"
-          />
-        </div>
-
-        {/* Description */}
-        <div>
-          <label htmlFor="video-description" className="block text-sm text-zinc-400 mb-1">
-            Description
-          </label>
-          <textarea
-            id="video-description"
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-            maxLength={500}
-            rows={3}
-            className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500 transition-colors text-sm resize-none"
-            placeholder="What's this video about?"
-          />
-        </div>
-
-        {/* Visibility */}
-        <div>
-          <label htmlFor="video-status" className="block text-sm text-zinc-400 mb-1">
-            Visibility
-          </label>
-          <select
-            id="video-status"
-            title="Video visibility"
-            value={form.status}
-            onChange={(e) => setForm({ ...form, status: e.target.value })}
-            className="bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+          {/* File picker */}
+          <div
+            role="button"
+            tabIndex={0}
+            aria-label="Select a video file to upload"
+            onClick={() => fileRef.current?.click()}
+            onKeyDown={(e) => e.key === "Enter" && fileRef.current?.click()}
+            className="border-2 border-dashed border-gray-700 hover:border-purple-500 focus:border-purple-500 rounded-2xl p-10 text-center cursor-pointer transition-all bg-gray-900/40 hover:bg-gray-900/70 shadow-sm hover:shadow-md"
           >
-            <option value="public">Public</option>
-            <option value="private">Private</option>
-          </select>
-        </div>
+            {preview ? (
+              <video src={preview} className="max-h-56 mx-auto rounded-lg border border-gray-800" controls />
+            ) : (
+              <div className="space-y-3">
+                <div className="text-5xl">🎬</div>
+                <p className="text-gray-300 text-sm font-medium">
+                  Click to select a video file
+                </p>
+                <p className="text-gray-500 text-xs">
+                  MP4, MOV, WebM — max 5 minutes
+                </p>
+              </div>
+            )}
+            <input
+              ref={fileRef}
+              id="video-file"
+              type="file"
+              accept="video/*"
+              aria-label="Video file input"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+          </div>
 
-        {error && <p className="text-red-400 text-sm" role="alert">{error}</p>}
+          {/* Title */}
+          <div>
+            <label htmlFor="video-title" className="block text-sm text-gray-400 mb-1">
+              Title *
+            </label>
+            <input
+              id="video-title"
+              type="text"
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              maxLength={100}
+              required
+              className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all text-sm"
+              placeholder="Give your video a title"
+            />
+          </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-medium py-3 rounded-xl transition-colors"
-        >
-          {loading ? "Uploading..." : "Upload Video"}
-        </button>
-      </form>
+          {/* Description */}
+          <div>
+            <label htmlFor="video-description" className="block text-sm text-gray-400 mb-1">
+              Description
+            </label>
+            <textarea
+              id="video-description"
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              maxLength={500}
+              rows={3}
+              className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all text-sm resize-none"
+              placeholder="What's this video about?"
+            />
+          </div>
+
+          {/* Visibility */}
+          <div>
+            <label htmlFor="video-status" className="block text-sm text-gray-400 mb-1">
+              Visibility
+            </label>
+            <select
+              id="video-status"
+              title="Video visibility"
+              value={form.status}
+              onChange={(e) => setForm({ ...form, status: e.target.value })}
+              className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+            >
+              <option value="public">Public</option>
+              <option value="private">Private</option>
+            </select>
+          </div>
+
+          {error && (
+            <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 px-3 py-2 rounded-lg" role="alert">
+              {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-medium py-3 rounded-xl transition-all shadow-sm hover:shadow-md"
+          >
+            {loading ? "Uploading..." : "Upload Video"}
+          </button>
+
+        </form>
+      </div>
     </div>
   );
 }
