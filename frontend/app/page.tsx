@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import VideoFeed from "@/components/VideoFeed";
@@ -31,32 +32,41 @@ export default function HomePage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Hero */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-1">ClipSphere</h1>
-        <p className="text-zinc-400 text-sm">Short videos. Big moments.</p>
-      </div>
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-6xl mx-auto px-4 py-10 space-y-8">
 
-      {/* Feed tabs */}
-      <div className="flex gap-2 mb-6 border-b border-zinc-800 pb-4">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => switchFeed(tab.id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              feed === tab.id
-                ? "bg-indigo-600 text-white"
-                : "text-zinc-400 hover:text-white hover:bg-zinc-800"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+        {/* Hero */}
+        <div>
+          <h1 className="text-3xl font-bold">ClipSphere</h1>
+          <p className="text-gray-400 text-sm mt-1">
+            Short videos. Big moments.
+          </p>
+        </div>
 
-      {/* Feed */}
-      <VideoFeed feedType={feed} />
+        {/* Tabs Card */}
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-3 flex gap-2 flex-wrap">
+
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => switchFeed(tab.id)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                feed === tab.id
+                  ? "bg-purple-600 text-white shadow-sm"
+                  : "text-gray-400 hover:text-white hover:bg-gray-800"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Feed container */}
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+          <VideoFeed feedType={feed} />
+        </div>
+
+      </div>
     </div>
   );
 }

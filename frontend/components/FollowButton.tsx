@@ -9,7 +9,10 @@ interface FollowButtonProps {
   initialFollowing?: boolean;
 }
 
-export default function FollowButton({ targetUserId, initialFollowing = false }: FollowButtonProps) {
+export default function FollowButton({
+  targetUserId,
+  initialFollowing = false,
+}: FollowButtonProps) {
   const { user } = useAuth();
   const [following, setFollowing] = useState(initialFollowing);
   const [loading, setLoading] = useState(false);
@@ -37,9 +40,9 @@ export default function FollowButton({ targetUserId, initialFollowing = false }:
     <button
       onClick={handleClick}
       disabled={loading}
-      className={`px-5 py-2 rounded-lg text-sm font-medium transition disabled:opacity-50 ${
+      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all disabled:opacity-50 shadow-sm hover:shadow-md ${
         following
-          ? "bg-gray-700 hover:bg-gray-600 text-white"
+          ? "bg-gray-800 border border-gray-700 text-white hover:border-purple-500/30 hover:bg-gray-700"
           : "bg-purple-600 hover:bg-purple-700 text-white"
       }`}
     >

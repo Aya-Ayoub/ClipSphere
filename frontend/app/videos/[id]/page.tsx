@@ -38,7 +38,6 @@ export default function VideoPage() {
         const data = videoRes.data.data;
         setVideo(data);
 
-
         const likeRes = await api.get(`/videos/${id}/like`);
 
         if (!isMounted) return;
@@ -63,11 +62,13 @@ export default function VideoPage() {
 
   if (loading) {
     return (
-      <div className="bg-black min-h-screen text-white">
-        <div className="max-w-3xl mx-auto px-4 py-8 space-y-4">
-          <div className="skeleton aspect-video rounded-xl" />
-          <div className="skeleton h-6 w-2/3" />
-          <div className="skeleton h-4 w-1/3" />
+      <div className="min-h-screen bg-black text-white">
+        <div className="max-w-3xl mx-auto px-4 py-10 space-y-4 animate-pulse">
+
+          <div className="aspect-video bg-gray-800 rounded-xl" />
+          <div className="h-6 w-2/3 bg-gray-800 rounded" />
+          <div className="h-4 w-1/3 bg-gray-800 rounded" />
+
         </div>
       </div>
     );
@@ -75,7 +76,7 @@ export default function VideoPage() {
 
   if (!video) {
     return (
-      <div className="bg-black min-h-screen flex items-center justify-center text-zinc-500">
+      <div className="min-h-screen bg-black flex items-center justify-center text-gray-500">
         Video not found.
       </div>
     );
@@ -84,27 +85,33 @@ export default function VideoPage() {
   const isOwner = user && video.owner?._id === user._id;
 
   return (
-    <main className="bg-black min-h-screen text-white">
-      <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+    <main className="min-h-screen bg-black text-white">
+      <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">
 
-        {/* VIDEO */}
-        <VideoPlayer src={video.signedUrl} title={video.title} />
+        {/* VIDEO CARD */}
+        <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+          <VideoPlayer src={video.signedUrl} title={video.title} />
+        </div>
 
+        {/* INFO CARD */}
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4 hover:border-purple-500/20 transition">
 
-        <div>
-          <h1 className="text-xl font-bold mb-1">{video.title}</h1>
+          {/* Title */}
+          <h1 className="text-xl font-bold">{video.title}</h1>
 
+          {/* Description */}
           {video.description && (
-            <p className="text-zinc-400 text-sm mb-3">
+            <p className="text-gray-400 text-sm">
               {video.description}
             </p>
           )}
 
-          <div className="flex items-center justify-between flex-wrap gap-3">
+          {/* Meta Row */}
+          <div className="flex items-center justify-between flex-wrap gap-4">
 
-            {/* OWNER */}
-            <div className="flex items-center gap-3">
-              <span className="text-zinc-400 text-sm">
+            {/* Owner */}
+            <div className="flex items-center gap-3 text-sm text-gray-400">
+              <span>
                 by{" "}
                 <span className="text-white font-medium">
                   @{video.owner?.username}
@@ -114,7 +121,7 @@ export default function VideoPage() {
               <FollowButton targetUserId={video.owner?._id} />
             </div>
 
-            {/* LIKE */}
+            {/* Like */}
             <LikeButton
               videoId={video._id}
               initialLiked={likeData.liked}
@@ -122,12 +129,12 @@ export default function VideoPage() {
             />
           </div>
 
-          {/* OWNER ACTIONS */}
+          {/* Owner actions */}
           {isOwner && (
-            <div className="flex gap-3 mt-3 pt-3 border-t border-zinc-800">
+            <div className="pt-3 border-t border-gray-800">
               <a
                 href={`/videos/${video._id}/edit`}
-                className="text-sm text-indigo-400 hover:text-indigo-300 transition"
+                className="text-sm text-purple-400 hover:text-purple-300 transition"
               >
                 Edit video
               </a>
@@ -137,20 +144,23 @@ export default function VideoPage() {
 
         {/* REVIEW FORM */}
         {user && !isOwner && (
-          <ReviewForm
-            videoId={video._id}
-            onSubmitted={() => setRefresh((r) => r + 1)}
-          />
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+            <ReviewForm
+              videoId={video._id}
+              onSubmitted={() => setRefresh((r) => r + 1)}
+            />
+          </div>
         )}
 
         {/* REVIEWS */}
-        <section>
-          <h2 className="font-semibold text-lg mb-3">
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
+
+          <h2 className="font-semibold text-lg">
             Reviews {video.reviews?.length ? `(${video.reviews.length})` : ""}
           </h2>
 
           {!video.reviews?.length ? (
-            <p className="text-zinc-500 text-sm">
+            <p className="text-gray-500 text-sm">
               No reviews yet. Be the first!
             </p>
           ) : (
@@ -158,17 +168,18 @@ export default function VideoPage() {
               {video.reviews.map((review: any) => (
                 <li
                   key={review._id}
-                  className="bg-zinc-900 border border-zinc-800 rounded-xl p-4"
+                  className="bg-gray-800/40 border border-gray-800 rounded-lg p-4 hover:border-purple-500/20 transition"
                 >
+
                   <div className="flex items-center gap-3 mb-2">
                     <StarRating value={review.rating} readonly size="sm" />
-                    <span className="text-zinc-400 text-xs">
+                    <span className="text-gray-400 text-xs">
                       @{review.user?.username || "user"}
                     </span>
                   </div>
 
                   {review.comment && (
-                    <p className="text-zinc-300 text-sm">
+                    <p className="text-gray-300 text-sm">
                       {review.comment}
                     </p>
                   )}
@@ -176,7 +187,7 @@ export default function VideoPage() {
               ))}
             </ul>
           )}
-        </section>
+        </div>
 
       </div>
     </main>
