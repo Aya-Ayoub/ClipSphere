@@ -15,13 +15,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="bg-black">
-      <body className="bg-black text-white min-h-screen">
+      <body className="bg-black text-white min-h-screen flex flex-col">
+
         <AuthProvider>
           <Navbar />
-          <main className="pt-16 min-h-screen bg-black">
+
+          {/* App content */}
+          <main className="flex-1 pt-16 bg-black">
             {children}
           </main>
+
         </AuthProvider>
+
       </body>
     </html>
   );

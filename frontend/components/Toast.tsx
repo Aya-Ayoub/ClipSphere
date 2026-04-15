@@ -8,22 +8,36 @@ interface ToastProps {
   onClose: () => void;
 }
 
-export default function Toast({ message, type = "success", onClose }: ToastProps) {
+export default function Toast({
+  message,
+  type = "success",
+  onClose,
+}: ToastProps) {
   useEffect(() => {
     const timer = setTimeout(onClose, 3000);
     return () => clearTimeout(timer);
   }, [onClose]);
 
-  const colors = {
-    success: "bg-green-600",
-    error: "bg-red-600",
-    info: "bg-purple-600",
+  const styles = {
+    success: "border-green-500/30 text-green-400",
+    error: "border-red-500/30 text-red-400",
+    info: "border-purple-500/30 text-purple-300",
   };
 
   return (
-    <div className={`fixed top-20 right-4 z-50 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3`}>
-      <span>{message}</span>
-      <button onClick={onClose} className="text-white/80 hover:text-white">✕</button>
+    <div
+      className={`fixed top-20 right-4 z-50 bg-gray-900 border rounded-xl px-5 py-3 shadow-lg flex items-center gap-3 animate-fade-in transition-all ${styles[type]}`}
+    >
+      {/* Message */}
+      <span className="text-sm font-medium">{message}</span>
+
+      {/* Close */}
+      <button
+        onClick={onClose}
+        className="ml-2 text-gray-400 hover:text-white transition"
+      >
+        ✕
+      </button>
     </div>
   );
 }

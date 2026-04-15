@@ -25,7 +25,7 @@ export default function VideoCard({ video, onDelete }: VideoCardProps) {
   const isOwner = user && video.owner?._id === user._id;
   const isAdmin = user?.role === "admin";
 
-  // ✅ LIKE STATE (same as VideoPage)
+  // LIKE STATE 
   const [likeData, setLikeData] = useState({
     count: 0,
     liked: false,
@@ -108,7 +108,7 @@ export default function VideoCard({ video, onDelete }: VideoCardProps) {
             @{video.owner?.username || "unknown"}
           </span>
 
-          {/* ❤️ LIKES (PURPLE HEART) */}
+          {/* LIKES */}
           <div className="text-xs text-zinc-400 flex items-center gap-1">
             <span className="text-purple-400">💜</span>
             {likeData.count}

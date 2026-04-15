@@ -19,10 +19,14 @@ export default function VideoPage() {
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(0);
 
+  //LIKE STATE
   const [likeData, setLikeData] = useState({
     count: 0,
     liked: false,
   });
+
+  // FOLLOW STATE
+  const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -31,22 +35,34 @@ export default function VideoPage() {
       setLoading(true);
 
       try {
+        // 1. GET VIDEO
         const videoRes = await getVideo(id);
-
         if (!isMounted) return;
 
         const data = videoRes.data.data;
         setVideo(data);
 
-
+        // 2. GET LIKES
         const likeRes = await api.get(`/videos/${id}/like`);
-
         if (!isMounted) return;
 
         setLikeData({
           count: likeRes.data.count,
           liked: likeRes.data.liked,
         });
+
+        if (user && data.owner?._id) {
+          try {
+            const res = await api.get(`/users/${data.owner._id}/follow-status`);
+
+            if (isMounted) {
+              setIsFollowing(res.data.following);
+            }
+          } catch (err) {
+            console.error("Follow status error:", err);
+          }
+        }
+
       } catch (err) {
         console.error("Failed to load video page:", err);
       } finally {
@@ -59,7 +75,7 @@ export default function VideoPage() {
     return () => {
       isMounted = false;
     };
-  }, [id, refresh]);
+  }, [id, refresh, user]);
 
   if (loading) {
     return (
@@ -90,7 +106,7 @@ export default function VideoPage() {
         {/* VIDEO */}
         <VideoPlayer src={video.signedUrl} title={video.title} />
 
-
+        {/* INFO */}
         <div>
           <h1 className="text-xl font-bold mb-1">{video.title}</h1>
 
@@ -102,7 +118,7 @@ export default function VideoPage() {
 
           <div className="flex items-center justify-between flex-wrap gap-3">
 
-            {/* OWNER */}
+            {/* OWNER + FOLLOW */}
             <div className="flex items-center gap-3">
               <span className="text-zinc-400 text-sm">
                 by{" "}
@@ -111,7 +127,10 @@ export default function VideoPage() {
                 </span>
               </span>
 
-              <FollowButton targetUserId={video.owner?._id} />
+              <FollowButton
+                targetUserId={video.owner?._id}
+                initialFollowing={isFollowing}
+              />
             </div>
 
             {/* LIKE */}

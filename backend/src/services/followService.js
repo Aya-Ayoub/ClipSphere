@@ -38,3 +38,15 @@ exports.getFollowing = async (userId) => {
     "username avatarKey"
   );
 };
+
+//
+// 🔥 ADD THIS (THIS IS THE MISSING PIECE)
+//
+exports.isFollowing = async (followerId, followingId) => {
+  const existing = await Follower.findOne({
+    followerId,
+    followingId,
+  });
+
+  return !!existing; // true or false
+};

@@ -44,11 +44,13 @@ export default function HomePage() {
           <button
             key={tab.id}
             onClick={() => switchFeed(tab.id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              feed === tab.id
-                ? "bg-indigo-600 text-white"
-                : "text-zinc-400 hover:text-white hover:bg-zinc-800"
-            }`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border
+              ${
+                feed === tab.id
+                  ? "bg-purple-600/20 text-purple-300 border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.15)]"
+                  : "text-gray-400 border-transparent hover:text-white hover:bg-gray-800 hover:border-purple-500/20"
+              }
+            `}
           >
             {tab.label}
           </button>

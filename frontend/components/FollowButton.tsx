@@ -4,30 +4,46 @@ import { useState } from "react";
 import { followUser, unfollowUser } from "@/services/api";
 import { useAuth } from "@/hooks/useAuth";
 
-interface FollowButtonProps {
+interface Props {
   targetUserId: string;
   initialFollowing?: boolean;
 }
 
-export default function FollowButton({ targetUserId, initialFollowing = false }: FollowButtonProps) {
+export default function FollowButton({
+  targetUserId,
+  initialFollowing = false,
+}: Props) {
   const { user } = useAuth();
   const [following, setFollowing] = useState(initialFollowing);
   const [loading, setLoading] = useState(false);
 
+  // self-follow protection
   if (!user || user._id === targetUserId) return null;
 
   const handleClick = async () => {
+    if (loading) return;
+
+    const prev = following;
+
+    // optimistic UI
+    setFollowing(!prev);
     setLoading(true);
+
     try {
-      if (following) {
+      if (prev) {
         await unfollowUser(targetUserId);
-        setFollowing(false);
       } else {
         await followUser(targetUserId);
-        setFollowing(true);
       }
-    } catch (err) {
-      console.error("Follow action failed:", err);
+    } catch (err: any) {
+      // handle "already following"
+      if (err.response?.status === 400) {
+        setFollowing(true);
+      } else {
+        setFollowing(prev);
+      }
+
+      console.error("Follow error:", err);
     } finally {
       setLoading(false);
     }
@@ -37,13 +53,13 @@ export default function FollowButton({ targetUserId, initialFollowing = false }:
     <button
       onClick={handleClick}
       disabled={loading}
-      className={`px-5 py-2 rounded-lg text-sm font-medium transition disabled:opacity-50 ${
+      className={`text-sm px-4 py-1.5 rounded-lg transition ${
         following
-          ? "bg-gray-700 hover:bg-gray-600 text-white"
-          : "bg-purple-600 hover:bg-purple-700 text-white"
+          ? "bg-purple-600/20 text-purple-300 hover:bg-purple-600/30 border border-purple-500/30"
+          : "bg-purple-600 text-white hover:bg-purple-700"
       }`}
     >
-      {loading ? "..." : following ? "Unfollow" : "Follow"}
+      {following ? "Unfollow" : "Follow"}
     </button>
   );
 }
