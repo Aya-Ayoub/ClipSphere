@@ -7,7 +7,9 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token") || Cookies.get("token");
+  const token =
+    (typeof window !== "undefined" ? localStorage.getItem("token") : null) ||
+    Cookies.get("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -39,7 +41,7 @@ export const uploadVideo = (formData: FormData) => {
   return api.post("/videos", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
-      "Authorization": `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 };
@@ -51,8 +53,10 @@ export const getTrendingVideos = (params?: object) => api.get("/videos/trending"
 export const getFollowingFeed = (params?: object) => api.get("/videos/following", { params });
 
 // Reviews
-export const createReview = (videoId: string, data: { rating: number; comment: string }) =>
-  api.post(`/videos/${videoId}/reviews`, data);
+export const createReview = (
+  videoId: string,
+  data: { rating: number; comment: string }
+) => api.post(`/videos/${videoId}/reviews`, data);
 
 // Admin
 export const getAdminStats = () => api.get("/admin/stats");
@@ -60,5 +64,16 @@ export const getAdminHealth = () => api.get("/admin/health");
 export const getAdminModeration = () => api.get("/admin/moderation");
 export const updateUserStatus = (id: string, data: object) =>
   api.patch(`/admin/users/${id}/status`, data);
+
+// Stripe / Tips
+export const createTipSession = (
+  creatorId: string,
+  data: { amount: number; message?: string }
+) => api.post(`/stripe/tip/${creatorId}`, data);
+
+export const getWallet = () => api.get("/stripe/wallet");
+
+export const getStripeSession = (sessionId: string) =>
+  api.get(`/stripe/session/${sessionId}`);
 
 export default api;

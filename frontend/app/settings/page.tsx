@@ -1,142 +1,197 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { register, login } from "@/services/api";
 import { useAuth } from "@/hooks/useAuth";
+import { updateMe, updatePreferences } from "@/services/api";
+import Toast from "@/components/Toast";
 
-export default function RegisterPage() {
-  const router = useRouter();
-  const { loginUser } = useAuth();
+interface ToastState {
+  message: string;
+  type: "success" | "error" | "info";
+}
+
+export default function SettingsPage() {
+  const { user, setUser } = useAuth();
 
   const [form, setForm] = useState({
-    username: "",
-    email: "",
-    password: "",
+    username: user?.username || "",
+    bio: user?.bio || "",
   });
 
-  const [error, setError] = useState("");
+  const [prefs, setPrefs] = useState({
+    inApp: user?.preferences?.inApp || {
+      followers: true,
+      comments: true,
+      likes: true,
+      tips: true,
+    },
+    email: user?.preferences?.email || {
+      followers: true,
+      comments: true,
+      likes: true,
+      tips: true,
+    },
+  });
+
+  const [toast, setToast] = useState<ToastState | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
-      await register(form);
-
-      const loginRes = await login({
-        email: form.email,
-        password: form.password,
-      });
-
-      loginUser(loginRes.data.token, loginRes.data.user);
-      router.push("/");
+      const res = await updateMe(form);
+      setUser(res.data);
+      setToast({ message: "Profile updated!", type: "success" });
     } catch (err: any) {
-      setError(err.response?.data?.message || "Registration failed");
+      setToast({
+        message: err.response?.data?.message || "Update failed",
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  const handlePrefsSave = async () => {
+    try {
+      await updatePreferences(prefs);
+      setToast({ message: "Preferences saved!", type: "success" });
+    } catch {
+      setToast({ message: "Failed to save preferences", type: "error" });
+    }
+  };
+
+  const togglePref = (channel: "inApp" | "email", key: string) => {
+    setPrefs((prev) => ({
+      ...prev,
+      [channel]: {
+        ...prev[channel],
+        [key]: !prev[channel][key as keyof typeof prev.inApp],
+      },
+    }));
+  };
+
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4 text-white">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-black text-white px-4 py-10">
+      <div className="max-w-2xl mx-auto space-y-8">
 
-        {/* Card */}
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 hover:border-purple-500/30 transition">
+        {toast && (
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast(null)}
+          />
+        )}
 
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold">Join ClipSphere</h1>
-            <p className="text-gray-400 text-sm mt-1">
-              Create your account
-            </p>
-          </div>
+        {/* Header */}
+        <div>
+          <h1 className="text-2xl font-bold">Settings</h1>
+          <p className="text-gray-400 text-sm mt-1">
+            Manage your account and preferences
+          </p>
+        </div>
 
-          {/* Error */}
-          {error && (
-            <div className="mb-6 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
+        {/* Profile Card */}
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-purple-500/30 transition">
+          <h2 className="text-lg font-semibold mb-4">Profile</h2>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleProfileSave} className="space-y-4">
 
             {/* Username */}
             <div>
-              <label className="block text-xs text-gray-400 mb-1">
+              <label htmlFor="username" className="block text-xs text-gray-400 mb-1">
                 Username
               </label>
               <input
-                type="text"
+                id="username"
                 value={form.username}
                 onChange={(e) =>
                   setForm({ ...form, username: e.target.value })
                 }
-                placeholder="johndoe"
-                required
                 className="w-full bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition"
               />
             </div>
 
-            {/* Email */}
+            {/* Bio */}
             <div>
-              <label className="block text-xs text-gray-400 mb-1">
-                Email
+              <label htmlFor="bio" className="block text-xs text-gray-400 mb-1">
+                Bio
               </label>
-              <input
-                type="email"
-                value={form.email}
-                onChange={(e) =>
-                  setForm({ ...form, email: e.target.value })
-                }
-                placeholder="you@example.com"
-                required
-                className="w-full bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition"
+              <textarea
+                id="bio"
+                value={form.bio}
+                onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                rows={3}
+                maxLength={200}
+                className="w-full bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 resize-none transition"
               />
             </div>
 
-            {/* Password */}
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                value={form.password}
-                onChange={(e) =>
-                  setForm({ ...form, password: e.target.value })
-                }
-                placeholder="Min 6 characters"
-                required
-                className="w-full bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition"
-              />
-            </div>
-
-            {/* Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-medium py-3 rounded-lg transition shadow-sm hover:shadow-md"
+              className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-medium px-6 py-2.5 rounded-lg transition shadow-sm hover:shadow-md"
             >
-              {loading ? "Creating account..." : "Create Account"}
+              {loading ? "Saving..." : "Save Profile"}
             </button>
           </form>
+        </div>
 
-          {/* Footer */}
-          <p className="text-center text-gray-400 text-sm mt-6">
-            Already have an account?{" "}
-            <Link
-              href="/login"
-              className="text-purple-400 hover:text-purple-300 transition"
-            >
-              Login
-            </Link>
-          </p>
+        {/* Preferences Card */}
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-purple-500/30 transition">
+          <h2 className="text-lg font-semibold mb-4">
+            Notification Preferences
+          </h2>
+
+          {(["inApp", "email"] as const).map((channel) => (
+            <div key={channel} className="mb-6">
+
+              <h3 className="text-xs text-gray-400 uppercase mb-3">
+                {channel === "inApp" ? "In-App" : "Email"} Alerts
+              </h3>
+
+              <div className="space-y-3">
+                {(["followers", "comments", "likes", "tips"] as const).map(
+                  (key) => (
+                    <label
+                      key={key}
+                      className="flex items-center justify-between bg-gray-800/30 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-800/50 transition"
+                    >
+                      <span className="text-sm text-gray-300 capitalize">
+                        {key}
+                      </span>
+
+                      <div
+                        onClick={() => togglePref(channel, key)}
+                        className={`w-11 h-6 rounded-full transition flex items-center ${
+                          prefs[channel][key]
+                            ? "bg-purple-600"
+                            : "bg-gray-700"
+                        }`}
+                      >
+                        <div
+                          className={`w-5 h-5 bg-white rounded-full transition transform ${
+                            prefs[channel][key]
+                              ? "translate-x-5"
+                              : "translate-x-0.5"
+                          }`}
+                        />
+                      </div>
+                    </label>
+                  )
+                )}
+              </div>
+            </div>
+          ))}
+
+          <button
+            onClick={handlePrefsSave}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2.5 rounded-lg transition shadow-sm hover:shadow-md"
+          >
+            Save Preferences
+          </button>
         </div>
       </div>
     </div>
