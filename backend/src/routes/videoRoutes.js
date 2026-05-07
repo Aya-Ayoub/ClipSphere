@@ -3,22 +3,16 @@ const express    = require("express");
 const controller = require("../controllers/videoController");
 const protect    = require("../middleware/protect");
 const ownership  = require("../middleware/ownershipMiddleware");
-const validate   = require("../middleware/validate");
-const { upload, checkDuration } = require("../middleware/uploadMiddleware");
-const { createVideoSchema }       = require("../validators/authValidator");
+const { upload, checkDuration }  = require("../middleware/uploadMiddleware");
+const { uploadLimiter }          = require("../middleware/rateLimiter");
 
 const router = express.Router();
 
 // ── Feeds (public) ────────────────────────────────────────────────────────────
 router.get("/",          controller.getVideos);
 router.get("/trending",  controller.getTrendingVideos);
-router.get("/following", protect, controller.getFollowingFeed);  // auth required
+router.get("/following", protect, controller.getFollowingFeed);
 router.get("/:id",       controller.getVideoById);
-
-// ── Create (with optional file upload) ───────────────────────────────────────
-// If uploading a real file use multipart/form-data with field name "video"
-// If just saving metadata use JSON body (Phase 1 style still works)
-
 
 /**
  * @swagger
@@ -93,6 +87,7 @@ router.get("/:id",       controller.getVideoById);
 router.post(
   "/",
   protect,
+  uploadLimiter,          // ← Phase 3: rate limit uploads (30/hour per IP)
   upload.single("video"),
   checkDuration,
   controller.createVideo

@@ -77,12 +77,33 @@ export default function ProfilePage() {
               </Link>
             </div>
 
-            {!isMe && <FollowButton targetUserId={id} />}
+            {/* Follow + Tip buttons — only shown to other users, not yourself */}
+            {!isMe && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <FollowButton targetUserId={id} />
+                {user && (
+                  <Link
+                    href={`/tips/${id}`}
+                    className="text-sm bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-4 py-1.5 rounded-lg hover:bg-yellow-500/30 transition"
+                  >
+                    💰 Tip
+                  </Link>
+                )}
+              </div>
+            )}
 
             {isMe && (
-              <a className="text-sm text-purple-400 hover:text-purple-300">
-                Edit profile
-              </a>
+              <div className="flex items-center gap-3">
+                <a className="text-sm text-purple-400 hover:text-purple-300">
+                  Edit profile
+                </a>
+                <Link
+                  href="/wallet"
+                  className="text-sm text-yellow-400 hover:text-yellow-300 transition"
+                >
+                  💰 My Wallet
+                </Link>
+              </div>
             )}
           </div>
         </div>
