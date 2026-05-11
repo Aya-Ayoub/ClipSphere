@@ -10,7 +10,7 @@ exports.followUser = async (followerId, followingId) => {
 
   const follow = await Follower.create({ followerId, followingId });
 
-  await notificationService.createIfAllowed(followingId, followerId, "follow");
+  await notificationService.createIfAllowed(followingId, followerId, "follow", "");
 
   return follow;
 };

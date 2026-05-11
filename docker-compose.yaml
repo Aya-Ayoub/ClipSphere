@@ -1,9 +1,7 @@
-version: "3.8"
-
 services:
   mongodb:
     image: mongo:7
-    container_name: clipsphere
+    container_name: clipsphere_mongo
     ports:
       - "27017:27017"
     volumes:
@@ -15,14 +13,22 @@ services:
     image: minio/minio
     container_name: clipsphere_minio
     ports:
-      - "9000:9000"   # S3 API
-      - "9001:9001"   # Web console
+      - "9000:9000"
+      - "9001:9001"
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin123
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
+    networks:
+      - clipsphere_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: clipsphere_redis
+    ports:
+      - "6379:6379"
     networks:
       - clipsphere_net
 
