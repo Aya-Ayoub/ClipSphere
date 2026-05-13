@@ -1,7 +1,5 @@
 const multer = require("multer");
 const ffmpeg = require("fluent-ffmpeg");
-ffmpeg.setFfmpegPath("C:\\ffmpeg-2026-04-09-git-d3d0b7a5ee-full_build\\bin\\ffmpeg.exe");
-ffmpeg.setFfprobePath("C:\\ffmpeg-2026-04-09-git-d3d0b7a5ee-full_build\\bin\\ffprobe.exe");
 const fs = require("fs");
 const path = require("path");
 

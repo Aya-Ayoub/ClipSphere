@@ -1,10 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import VideoFeed from "@/components/VideoFeed";
 import { useAuth } from "@/hooks/useAuth";
 
-export default function HomePage() {
+function HomeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useAuth();
@@ -32,13 +32,11 @@ export default function HomePage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Hero */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-1">ClipSphere</h1>
         <p className="text-zinc-400 text-sm">Short videos. Big moments.</p>
       </div>
 
-      {/* Feed tabs */}
       <div className="flex gap-2 mb-6 border-b border-zinc-800 pb-4">
         {tabs.map((tab) => (
           <button
@@ -57,8 +55,33 @@ export default function HomePage() {
         ))}
       </div>
 
-      {/* Feed */}
       <VideoFeed feedType={feed} />
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-white mb-1">ClipSphere</h1>
+          <p className="text-zinc-400 text-sm">Short videos. Big moments.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 animate-pulse">
+              <div className="aspect-video bg-zinc-800" />
+              <div className="p-3 space-y-2">
+                <div className="h-4 bg-zinc-800 rounded w-3/4" />
+                <div className="h-3 bg-zinc-800 rounded w-1/2" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }

@@ -1,5 +1,32 @@
-node_modules
-.env.*
+# Environment variables
 .env
-.env.backup
-uploads/
+.env.local
+.env.*.local
+
+# SSL certificates (generated locally, never committed)
+nginx/certs/*.key
+nginx/certs/*.crt
+nginx/certs/*.pem
+
+# Node modules
+node_modules/
+*/node_modules/
+
+# Next.js build output
+frontend/.next/
+frontend/out/
+
+# Uploads (temp files)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Docker volumes (local data)
+mongo_data/
+minio_data/
+redis_data/
+
+# OS
+.DS_Store
+Thumbs.db
+
+*.pem
