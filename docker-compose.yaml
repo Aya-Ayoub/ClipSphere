@@ -134,7 +134,9 @@ services:
       - clipsphere_net
     # Console accessible via Nginx at /storage or directly on :9001 for dev
     ports:
+      - "9000:9000"   # MinIO console (dev convenience)
       - "9001:9001"   # MinIO console (dev convenience)
+
 
   # ── F: Redis ──────────────────────────────────────────────────────────────
   redis:
