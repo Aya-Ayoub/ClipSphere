@@ -21,6 +21,7 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const { initBuckets }     = require("./config/minio");
 const globalErrorHandler  = require("./middleware/globalErrorHandler");
 const { apiLimiter, authLimiter, uploadLimiter } = require("./middleware/rateLimiter");
+const { connectRedis } = require("./config/redis");
 
 const app = express();
 
@@ -193,6 +194,7 @@ mongoose
   .then(async () => {
     console.log("MongoDB connected");
     await initBuckets();
+    await connectRedis();
   })
   .catch((err) => console.error("MongoDB connection error:", err));
 

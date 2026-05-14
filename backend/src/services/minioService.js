@@ -24,14 +24,22 @@ exports.uploadFile = async (filePath, objectKey, mimeType) => {
   return objectKey;
 };
 
-// Generate a temporary presigned URL for secure video access
+// Generate a temporary presigned URL for secure video access.
+// When running inside Docker, the S3 client signs URLs with the internal
+// service hostname (e.g. "minio"). We replace it with "localhost" so the
+// browser can actually reach the file.
 exports.getPresignedUrl = async (objectKey, expiresInSeconds = 3600) => {
   const command = new GetObjectCommand({
     Bucket: BUCKET,
     Key: objectKey,
   });
 
-  const url = await getSignedUrl(s3, command, { expiresIn: expiresInSeconds });
+  let url = await getSignedUrl(s3, command, { expiresIn: expiresInSeconds });
+
+  // Replace internal Docker hostname with localhost for browser access
+  const internalEndpoint = `http://${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT}`;
+  url = url.replace(internalEndpoint, "http://localhost:9000");
+
   return url;
 };
 

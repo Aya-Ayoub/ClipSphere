@@ -3,6 +3,7 @@ const express    = require("express");
 const controller = require("../controllers/videoController");
 const protect    = require("../middleware/protect");
 const ownership  = require("../middleware/ownershipMiddleware");
+const restrictTo = require("../middleware/restrictTo");
 const { upload, checkDuration }  = require("../middleware/uploadMiddleware");
 const { uploadLimiter }          = require("../middleware/rateLimiter");
 
@@ -87,7 +88,7 @@ router.get("/:id",       controller.getVideoById);
 router.post(
   "/",
   protect,
-  uploadLimiter,          // ← Phase 3: rate limit uploads (30/hour per IP)
+  uploadLimiter,
   upload.single("video"),
   checkDuration,
   controller.createVideo
@@ -219,5 +220,26 @@ router.patch("/:id", protect, ownership.checkOwnership, controller.updateVideo);
  *         description: Video not found
  */
 router.delete("/:id", protect, ownership.checkOwnershipOrAdmin, controller.deleteVideo);
+
+/**
+ * @swagger
+ * /api/v1/videos/cache/clear:
+ *   delete:
+ *     summary: (Admin only) Clear all Redis feed caches
+ *     description: >
+ *       Forces the trending and public feed caches to be invalidated.
+ *       Useful after bulk uploads or manual data changes.
+ *     tags: [Videos]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Feed caches cleared successfully
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Admin role required
+ */
+router.delete("/cache/clear", protect, restrictTo("admin"), controller.clearCache);
 
 module.exports = router;

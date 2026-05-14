@@ -5,7 +5,6 @@ exports.createVideo = async (req, res, next) => {
   try {
     const filePath = req.file ? req.file.path : null;
 
-    // Merge ffmpeg duration into body
     const data = {
       ...req.body,
       ...(req.videoDuration && { duration: req.videoDuration }),
@@ -75,4 +74,12 @@ exports.deleteVideo = async (req, res, next) => {
   }
 };
 
-
+// Admin-only: manually clear all feed caches
+exports.clearCache = async (req, res, next) => {
+  try {
+    await videoService.invalidateFeedCaches();
+    res.status(200).json({ status: "success", message: "Feed caches cleared" });
+  } catch (err) {
+    next(err);
+  }
+};
